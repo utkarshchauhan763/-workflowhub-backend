@@ -1,6 +1,5 @@
-require("dotenv").config();
 const app = require("./app");
-const PORT = process.env.PORT || 5000;
-app.listen(PORT,()=>{
-    console.log(`workflow server running on port ${PORT}`);
+const config = require("./config/env");
+app.listen(config.port,()=>{
+    console.log(`WorkflowHub server running on port ${config.port} in ${config.nodeEnv} mode`);
 });
