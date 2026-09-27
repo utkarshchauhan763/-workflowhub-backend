@@ -1,4 +1,3 @@
-const { message } = require("../validators/health.validator");
 
 const validate = (schema) => {
     return (req,res,next)=>{
