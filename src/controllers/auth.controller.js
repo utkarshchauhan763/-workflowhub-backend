@@ -65,8 +65,26 @@ const getMe = async(req,res,next) => {
     }
 }
 
+const adminTest = async(req,res,next) => {
+    try{
+        return sendSuccess(
+            res,
+            200,
+            "Admin access granted",
+            {
+                userId: req.user._id,
+                role: req.user.role
+            }
+        );
+    }
+    catch(error){
+        next(error);
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
-    getMe
+    getMe,
+    adminTest
 };
