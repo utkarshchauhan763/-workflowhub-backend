@@ -10,7 +10,7 @@ const createProjectSchema = Joi.object({
         .max(1000)
         .allow("", null),
     status: Joi.string()
-        .valid("planning","active","completed","archived")
+        .valid("planning", "active", "completed", "archived")
         .default("planning"),
     startDate: Joi.date()
         .optional(),
@@ -28,13 +28,20 @@ const updateProjectSchema = Joi.object({
         .trim()
         .max(1000)
         .allow("", null),
+    members: Joi.array()
+        .items(
+            Joi.string()
+                .hex()
+                .length(24)
+        ),
     status: Joi.string()
-        .valid("planning","active","completed","archived"),
+        .valid("planning", "active", "completed", "archived"),
     startDate: Joi.date(),
-    endeDate: Joi.date()
+    endeDate: Joi.date(),
+
 })
     .min(1);
-module.exports = { 
+module.exports = {
     createProjectSchema,
     updateProjectSchema
- };
+};

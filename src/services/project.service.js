@@ -43,11 +43,11 @@ const getProjectById = async (projectId, userId, role) => {
             _id: projectId,
             $or: [
                 { owner: userId },
-                { member: userId }
+                { members: userId }
             ]
         })
             .populate("owner", "name email")
-            .populate("user", "name email");
+            .populate("members", "name email");
     }else{
         project = await Project.findById(projectId)
             .populate("owner","name email")
