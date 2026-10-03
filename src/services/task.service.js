@@ -2,6 +2,7 @@ const Project = require("../models/project.model");
 const Task = require("../models/task.model");
 const User = require("../models/user.model");
 const activityLogService = require("./activityLog.service");
+const notificationService = require("./notification.service");
 
 const createTask = async ({
     title,
@@ -59,6 +60,19 @@ const createTask = async ({
         dueDate,
         createdBy
     });
+    if(assignedTo){
+        await notificationService.createNotification({
+            recipient: assignedTo,
+            type: "task_assigned",
+            title: "New task assigned",
+            message: `You have been assigned to a new task: ${task.title}`,
+            relatedResource:{
+                resourceType: "Task",
+                resourceId: task._id
+            }
+        });
+    }
+
 
     await activityLogService.createActivityLog({
         user: createdBy,
