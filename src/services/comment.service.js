@@ -1,5 +1,6 @@
 const Comment = require("../models/comment.model");
 const Task = require("../models/task.model");
+const activityLogService = require("./activityLog.service");
 
 const createComment =  async(taskId, authorId, content) => {
     const task = await Task.findById(taskId);
@@ -13,6 +14,15 @@ const createComment =  async(taskId, authorId, content) => {
         author: authorId,
         content
     });
+    
+    await activityLogService.createActivityLog({
+        user: authorId,
+        action: "created",
+        resource: "Comment",
+        resourceId: comment._id,
+        details: `Created comment on task: ${taskId}`
+    });
+
     return comment;
 };
 
@@ -55,6 +65,13 @@ const updateComment = async (commentId, userId, content) => {
 
     await comment.save();
 
+    await activityLogService.createActivityLog({
+        user: userId,
+        action: "updated",
+        resource: "Comment",
+        resourceId: comment._id,
+        details: "Updated comment"
+    });
     return comment;
 };
 
@@ -76,6 +93,15 @@ const deleteComment = async (commentId, userId) => {
     }
 
     await Comment.findByIdAndDelete(commentId);
+    await Comment.findByIdAndDelete(commentId);
+
+    await activityLogService.createActivityLog({
+        user: userId,
+        action: "deleted",
+        resource: "Comment",
+        resourceId: comment._id,
+        details: "Deleted comment"
+    });
 };
 
 module.exports = {

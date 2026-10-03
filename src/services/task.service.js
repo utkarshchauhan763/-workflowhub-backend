@@ -1,6 +1,7 @@
 const Project = require("../models/project.model");
 const Task = require("../models/task.model");
 const User = require("../models/user.model");
+const activityLogService = require("./activityLog.service");
 
 const createTask = async ({
     title,
@@ -59,7 +60,17 @@ const createTask = async ({
         createdBy
     });
 
+    await activityLogService.createActivityLog({
+        user: createdBy,
+        action: "created",
+        resource: "Task",
+        resourceId: task._id,
+        details: `Created task: ${task.title}`
+    });
+
     return task;
+
+
 };
 
 const getTasks = async(userId, role) => {
@@ -148,6 +159,13 @@ const updateTask = async(
     if(role === "admin"){
         Object.assign(task,updateData);
         await task.save();
+        await activityLogService.createActivityLog({
+            user: userId,
+            action: "updated",
+            resource: "Task",
+            resourceId: task._id,
+            details: `Updated task: ${task.title}`
+        });
         return task;
     }
     if(role === "manager"){
@@ -160,6 +178,13 @@ const updateTask = async(
         }
         Object.assign(task,updateData);
         await task.save();
+        await activityLogService.createActivityLog({
+            user: userId,
+            action: "updated",
+            resource: "Task",
+            resourceId: task._id,
+            details: `Updated task: ${task.title}`
+        });
         return task;
     }
 
@@ -177,6 +202,13 @@ const updateTask = async(
 
         Object.assign(task,allowedUpdates);
         await task.save();
+        await activityLogService.createActivityLog({
+            user: userId,
+            action: "updated",
+            resource: "Task",
+            resourceId: task._id,
+            details: `Updated task: ${task.title}`
+        });
         return task;
 
     }
@@ -193,6 +225,13 @@ const deleteTask = async(taskId, userId, role) => {
     }
     if(role === "admin"){
         await Task.findByIdAndDelete(taskId);
+        await activityLogService.createActivityLog({
+            user: userId,
+            action: "deleted",
+            resource: "Task",
+            resourceId: task._id,
+            details: `Deleted task: ${task.title}`
+        });
         return;
     }
     if(role === "manager"){
@@ -202,12 +241,22 @@ const deleteTask = async(taskId, userId, role) => {
             throw error;
         }
         await Task.findByIdAndDelete(taskId);
+        await activityLogService.createActivityLog({
+            user: userId,
+            action: "deleted",
+            resource: "Task",
+            resourceId: task._id,
+            details: `Deleted task: ${task.title}`
+        });
+
         return;
     }
     const error = new Error("You do not have permission to delete this task");
     error.statusCode = 403;
     throw error;
 }
+
+
 
 
 module.exports = {
